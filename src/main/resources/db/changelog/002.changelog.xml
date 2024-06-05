@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.6.xsd">
+    <property name="now" value="sysdate" dbms="oracle"/>
+    <property name="now" value="now()" dbms="mysql,postgresql"/>
+    <property name="now" value="CURRENT_TIMESTAMP()" dbms="h2"/>
+    <changeSet id="11022024:001" author="brice.mbiandji">
+        <addColumn tableName="t_mail_server">
+            <column name="c_use_as_default" type="BOOLEAN" defaultValueBoolean="false"/>
+        </addColumn>
+        <insert tableName="t_mail_server">
+            <column name="c_id" value="a7afc818-fd96-4042-bd73-1ab7a34e0294"/>
+            <column name="c_name" value="Serveur Root"/>
+            <column name="c_from_email" value="ambiandji@gmail.com"/>
+            <column name="c_created_at" valueDate="now()"/>
+            <column name="c_type" value="GOOGLE"/>
+            <column name="c_host" value="smtp.gmail.com"/>
+            <column name="c_port" valueNumeric="587"/>
+            <column name="c_protocol" value="smtp"/>
+            <column name="c_use_ssl" valueBoolean="true"/>
+            <column name="c_use_auth" valueBoolean="true"/>
+            <column name="c_use_as_default" valueBoolean="true"/>
+            <column name="c_username" value="ambiandji@gmail.com"/>
+            <column name="c_password" value="jwwwfztsrvpdwknz"/>
+            <column name="c_state" value="CONFIRM"/>
+            <column name="c_verified_at" valueDate="now()"/>
+        </insert>
+        <createTable tableName="t_mail_template">
+            <column autoIncrement="false" name="c_id" type="VARCHAR(255)">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_t_mail_template"/>
+            </column>
+            <column name="c_name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="c_type" type="VARCHAR(32)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addUniqueConstraint columnNames="c_name" constraintName="uk_t_mail_template_name" tableName="t_mail_template"/>
+    </changeSet>
+    <changeSet id="11022024:002" author="brice.mbiandji">
+        <createTable tableName="t_mail">
+            <column autoIncrement="false" name="c_id" type="VARCHAR(255)">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_t_mail"/>
+            </column>
+            <column name="c_created_at" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="c_to" type="VARCHAR(512)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="c_subject" type="VARCHAR(512)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="c_message" type="TEXT"/>
+            <column name="c_external_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="c_state" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="c_type" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="c_send_at" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="c_mail_template_id" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="c_mail_server_id" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addForeignKeyConstraint baseColumnNames="c_mail_server_id" baseTableName="t_mail"
+                                 constraintName="fk_t_mail_server_id" deferrable="false" initiallyDeferred="false"
+                                 onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="c_id"
+                                 referencedTableName="t_mail_server"/>
+        <addForeignKeyConstraint baseColumnNames="c_mail_template_id" baseTableName="t_mail"
+                                 constraintName="fk_t_mail_template_id" deferrable="false" initiallyDeferred="false"
+                                 onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="c_id"
+                                 referencedTableName="t_mail_template"/>
+        <createIndex indexName="ix_t_mail_mail_template_id" tableName="t_mail">
+            <column name="c_mail_template_id"/>
+        </createIndex>
+        <createIndex indexName="ix_t_mail_mail_server_id" tableName="t_mail">
+            <column name="c_mail_server_id"/>
+        </createIndex>
+        <addUniqueConstraint columnNames="c_type" constraintName="uk_t_mail_type" tableName="t_mail"/>
+    </changeSet>
+    <changeSet id="11022024:003" author="brice.mbiandji">
+        <createTable tableName="t_mail_attribute">
+            <column name="c_mail_id" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="c_attribute_key" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="c_attribute_value" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addPrimaryKey tableName="t_mail_attribute" columnNames="c_mail_id,c_attribute_key" constraintName="pk_t_mail_attribute"/>
+        <addForeignKeyConstraint baseColumnNames="c_mail_id" baseTableName="t_mail_attribute"
+                                 constraintName="fk_t_mail_attribute_mail_id" deferrable="false" initiallyDeferred="false"
+                                 onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="c_id"
+                                 referencedTableName="t_mail"/>
+    </changeSet>
+    <changeSet id="11022024:004" author="brice.mbiandji">
+        <insert tableName="t_mail_template">
+            <column name="c_id" value="ca89fcfc-56de-4f66-9cba-b4b60910c201"/>
+            <column name="c_name" value="activate-account"/>
+            <column name="c_type" value="ACTIVATE_ACCOUNT"/>
+        </insert>
+    </changeSet>
+    <changeSet id="12022024:001" author="brice.mbiandji">
+        <dropNotNullConstraint tableName="t_mail" columnName="c_external_id"/>
+    </changeSet>
+    <changeSet id="12022024:002" author="brice.mbiandji">
+        <dropNotNullConstraint tableName="t_mail" columnName="c_send_at"/>
+    </changeSet>
+    <changeSet id="12022024:003" author="brice.mbiandji">
+        <insert tableName="t_mail_template">
+            <column name="c_id" value="e2d51115-bf8c-43cd-94d8-bd24ff01b6d5"/>
+            <column name="c_name" value="mfa"/>
+            <column name="c_type" value="MFA"/>
+        </insert>
+    </changeSet>
+    <changeSet id="12022024:004" author="brice.mbiandji">
+        <insert tableName="t_mail_template">
+            <column name="c_id" value="f0d9962f-88ca-49c9-8dbc-eaaf1941155d"/>
+            <column name="c_name" value="verify-server"/>
+            <column name="c_type" value="VERIFY_MAIL_SERVER"/>
+        </insert>
+        <insert tableName="t_mail_template">
+            <column name="c_id" value="b4dba0d6-4b00-4bf5-8964-d6eb48c147f9"/>
+            <column name="c_name" value="reset-password"/>
+            <column name="c_type" value="RESET_PASSWORD"/>
+        </insert>
+        <insert tableName="t_mail_template">
+            <column name="c_id" value="8f9e0614-c5a5-4741-b422-d09825f39673"/>
+            <column name="c_name" value="not-applicable"/>
+            <column name="c_type" value="NOT_APPLICABLE"/>
+        </insert>
+    </changeSet>
+    <changeSet id="12022024:005" author="brice.mbiandji">
+        <dropUniqueConstraint tableName="t_mail" constraintName="uk_t_mail_type"/>
+        <addUniqueConstraint columnNames="c_type" constraintName="uk_t_mail_template_type" tableName="t_mail_template"/>
+    </changeSet>
+</databaseChangeLog>

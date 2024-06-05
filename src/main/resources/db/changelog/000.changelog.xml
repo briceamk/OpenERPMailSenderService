@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.6.xsd">
+    <property name="now" value="sysdate" dbms="oracle"/>
+    <property name="now" value="now()" dbms="mysql,postgresql"/>
+    <property name="now" value="CURRENT_TIMESTAMP()" dbms="h2"/>
+    <changeSet id="04022024:001" author="brice.mbiandji">
+        <createTable tableName="t_user">
+            <column autoIncrement="false" name="c_id" type="VARCHAR(255)">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_t_user_id"/>
+            </column>
+            <column name="c_created_at" type="DATETIME"/>
+            <column name="c_first_name" type="VARCHAR(64)"/>
+            <column name="c_last_name" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="c_email" type="VARCHAR(512)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="c_password" type="VARCHAR(512)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="c_phone" type="VARCHAR(32)"/>
+            <column name="c_image_url" type="VARCHAR(512)" defaultValue="https://cdn-icons-png.flaticon.com/512/149/149071.png"/>
+            <column name="c_failed_login_attempt" type="INT" defaultValueNumeric="0"/>
+            <column name="c_account_enabled" type="BOOLEAN" defaultValueBoolean="false"/>
+            <column name="c_account_not_locked" type="BOOLEAN" defaultValueBoolean="true"/>
+            <column name="c_account_not_expired" type="BOOLEAN" defaultValueBoolean="true"/>
+            <column name="c_credential_not_expired" type="BOOLEAN" defaultValueBoolean="true"/>
+            <column name="c_use_mfa" type="BOOLEAN" defaultValueBoolean="false"/>
+        </createTable>
+    </changeSet>
+    <changeSet id="04022024:002" author="brice.mbiandji">
+        <addUniqueConstraint columnNames="c_email" constraintName="uk_t_user_email" tableName="t_user"/>
+        <addUniqueConstraint columnNames="c_phone" constraintName="uk_t_user_phone" tableName="t_user"/>
+    </changeSet>
+    <changeSet id="04022024:003" author="brice.mbiandji">
+        <createTable tableName="t_role">
+            <column autoIncrement="false" name="c_id" type="VARCHAR(255)">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_t_role_id"/>
+            </column>
+            <column name="c_name" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="c_permission" type="TEXT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet id="04022024:004" author="brice.mbiandji">
+        <addUniqueConstraint columnNames="c_name" constraintName="uk_t_role_name" tableName="t_role"/>
+    </changeSet>
+    <changeSet id="05022024:001" author="brice.mbiandji">
+        <createTable tableName="t_user_role">
+            <column name="c_role_id" type="VARCHAR(255)"/>
+            <column name="c_user_id" type="VARCHAR(255)"/>
+        </createTable>
+        <createIndex indexName="ix_t_user_role_role_id" tableName="t_user_role">
+            <column name="c_role_id"/>
+        </createIndex>
+        <createIndex indexName="ix_t_user_role_user_id" tableName="t_user_role">
+            <column name="c_user_id"/>
+        </createIndex>
+        <addForeignKeyConstraint baseColumnNames="c_role_id" baseTableName="t_user_role"
+                                 constraintName="fk_t_user_role_role_id" deferrable="false" initiallyDeferred="false"
+                                 onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="c_id"
+                                 referencedTableName="t_role"/>
+        <addForeignKeyConstraint baseColumnNames="c_user_id" baseTableName="t_user_role"
+                                 constraintName="fk_t_user_role_user_id" deferrable="false" initiallyDeferred="false"
+                                 onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="c_id"
+                                 referencedTableName="t_user"/>
+    </changeSet>
+    <changeSet id="04022024:005" author="brice.mbiandji">
+        <insert tableName="t_user">
+            <column name="c_id" value="663a5be5-ee00-41aa-9f9a-9288c4d37a7c"/>
+            <column name="c_created_at" valueDate="now()"/>
+            <column name="c_last_name" value="Administrator"/>
+            <column name="c_email" value="ambiandji@gmail.com"/>
+            <column name="c_password" value="$2a$12$p/d7Wi8rc4agvTVfNlOZb.PkM8uP0CH07K65x4VMuvsepcZx0wjLG"/>
+            <column name="c_account_enabled" valueBoolean="true"/>
+        </insert>
+        <insert tableName="t_role">
+            <column name="c_id" value="3bcec3d6-36a8-4149-b0c0-46cb8d2079d3"/>
+            <column name="c_name" value="ROLE_USER"/>
+            <column name="c_permission" value="read:mail:server"/>
+        </insert>
+        <insert tableName="t_role">
+            <column name="c_id" value="5f1f0637-a0a1-493a-8ed3-26d235464f35"/>
+            <column name="c_name" value="ROLE_MANAGER"/>
+            <column name="c_permission" value="read:mail_server,create:mail_server,update:mail_server,update:send_code:mail_server,update:verify_code:mail_server"/>
+        </insert>
+        <insert tableName="t_role">
+            <column name="c_id" value="a2f62b58-159c-470e-b2e7-43e434ed29c4"/>
+            <column name="c_name" value="ROLE_ADMIN"/>
+            <column name="c_permission" value="read:mail_server,create:mail_server,update:mail_server,update:send_code:mail_server,update:verify_code:mail_server"/>
+        </insert>
+        <insert tableName="t_user_role">
+            <column name="c_user_id" value="663a5be5-ee00-41aa-9f9a-9288c4d37a7c"/>
+            <column name="c_role_id" value="a2f62b58-159c-470e-b2e7-43e434ed29c4"/>
+        </insert>
+    </changeSet>
+</databaseChangeLog>

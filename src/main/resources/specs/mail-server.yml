@@ -1,0 +1,448 @@
+openapi: 3.1.0
+info:
+  title: Mail Server API
+  description: |
+    REST API endpoints for Mail Server
+  version: 1.0.0
+servers:
+  - url: http://localhost:8089/api/v1/openerpmailsender
+    description: Development server
+paths:
+  /mail-servers:
+    post:
+      tags:
+        - MailServer
+      summary: Return the created mail server in database
+      operationId: createMailServer
+      security:
+        - oAuth:
+            - create:mail_server
+      requestBody:
+        required: true
+        description: The mail server object we need to create
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateMailServerDto'
+      responses:
+        201:
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiSuccessResponseDto'
+        400:
+          description: Bad operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponseDto'
+        409:
+          description: Conflict operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponseDto'
+    get:
+      tags:
+        - MailServer
+      summary: Fetch all mail servers from database
+      operationId: fetchMailServers
+      security:
+        - oAuth:
+            - read:mail_server
+      parameters:
+        - $ref: '#/components/parameters/page'
+        - $ref: '#/components/parameters/size'
+        - $ref: '#/components/parameters/direction'
+        - $ref: '#/components/parameters/attribute'
+      responses:
+        200:
+          description: successful operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiSuccessResponseDto'
+        400:
+          description: bad operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponseDto'
+        404:
+          description: not found operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponseDto'
+  /mail-servers/search:
+    get:
+      tags:
+        - MailServer
+      summary: Fetch all mail server matching a keyword
+      operationId: fetchMailServerByKeyword
+      security:
+        - oAuth:
+            - read:mail_server
+      parameters:
+        - $ref: '#/components/parameters/page'
+        - $ref: '#/components/parameters/size'
+        - $ref: '#/components/parameters/direction'
+        - $ref: '#/components/parameters/attribute'
+        - $ref: '#/components/parameters/keyword'
+      responses:
+        200:
+          description: successful operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiSuccessResponseDto'
+        400:
+          description: bad operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponseDto'
+        404:
+          description: not found operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponseDto'
+  /mail-servers/send-code/{mailServerId}:
+    put:
+      tags:
+        - MailServer
+      summary: Send code to verify mail server
+      operationId: sendCode
+      security:
+        - oAuth:
+            - update:send_code:mail_server
+      parameters:
+        - $ref: '#/components/parameters/mailServerId'
+      requestBody:
+        description: Recipient of the code we are sending
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RecipientDto'
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiSuccessResponseDto'
+        400:
+          description: Bad operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponseDto'
+  /mail-servers/confirm/code/{mailServerId}:
+    put:
+      tags:
+        - MailServer
+      summary: Verify the mail server with the code send by mail
+      operationId: verifyCode
+      security:
+        - oAuth:
+            - update:verify_code:mail_server
+      parameters:
+        - $ref: '#/components/parameters/mailServerId'
+      requestBody:
+        description: The code object use to verify the server
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CodeVerificationDto'
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiSuccessResponseDto'
+        400:
+          description: Bad operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponseDto'
+        404:
+          description: not found operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponseDto'
+  /mail-servers/{mailServerId}:
+    put:
+      tags:
+        - MailServer
+      summary: Update mail server in database
+      operationId: updateMailServer
+      security:
+        - oAuth:
+            - update:mail_server
+      parameters:
+        - $ref: '#/components/parameters/mailServerId'
+      requestBody:
+        required: true
+        description: The mail server object we need to update
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateMailServerDto'
+      responses:
+        200:
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiSuccessResponseDto'
+        400:
+          description: Bad operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponseDto'
+        409:
+          description: Conflict operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponseDto'
+    get:
+      tags:
+        - MailServer
+      summary: Return mail server fetched from database with provided id
+      operationId: fetchMailServerById
+      security:
+        - oAuth:
+            - read:mail_server
+      parameters:
+        - $ref: '#/components/parameters/mailServerId'
+      responses:
+        200:
+          description: successful operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiSuccessResponseDto'
+        404:
+          description: not found operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponseDto'
+components:
+  parameters:
+    mailServerId:
+      name: mailServerId
+      in: path
+      required: true
+      schema:
+        type: string
+    page:
+      name: page
+      in: query
+      required: true
+      schema:
+        type: integer
+    size:
+      name: size
+      in: query
+      required: true
+      schema:
+        type: integer
+    direction:
+      name: direction
+      in: query
+      required: true
+      schema:
+        type: string
+        enum:
+          - ASC
+          - DSC
+    attribute:
+      name: attribute
+      in: query
+      required: true
+      schema:
+        type: string
+    keyword:
+      name: keyword
+      in: query
+      required: true
+      schema:
+        type: string
+  schemas:
+    ValidationErrorDto:
+      type: object
+      required:
+        - field
+        - message
+      properties:
+        field:
+          type: string
+        message:
+          type: string
+    ApiResponseDto:
+      type: object
+      required:
+        - timestamp
+        - code
+        - status
+        - success
+      properties:
+        timestamp:
+          type: string
+        code:
+          type: integer
+          format: int32
+        status:
+          type: string
+        success:
+          type: boolean
+    ApiSuccessResponseDto:
+      allOf:
+        - $ref: '#/components/schemas/ApiResponseDto'
+        - type: object
+          properties:
+            message:
+              type: string
+            data:
+              type: object
+              additionalProperties:
+                type: object
+    ApiErrorResponseDto:
+      allOf:
+        - $ref: '#/components/schemas/ApiResponseDto'
+        - type: object
+          required:
+            - reason
+            - path
+            - trackId
+          properties:
+            reason:
+              type: string
+            developerMessage:
+              type: string
+            path:
+              type: string
+            trackId:
+              type: string
+              format: uuid
+            error:
+              type: array
+              items:
+                $ref: '#/components/schemas/ValidationErrorDto'
+    CreateMailServerDto:
+      type: object
+      required:
+        - name
+        - fromEmail
+        - type
+        - host
+        - port
+      properties:
+        name:
+          type: string
+        fromEmail:
+          type: string
+        type:
+          type: string
+          enum:
+            - GOOGLE
+            - YAHOO
+            - MICROSOFT
+            - OTHER
+        host:
+          type: string
+        port:
+          type: integer
+          format: int32
+        useSSL:
+          type: boolean
+        useAuth:
+          type: boolean
+        username:
+          type: string
+          format: email
+        password:
+          type: string
+          format: password
+        protocol:
+          type: string
+    UpdateMailServerDto:
+      type: object
+      required:
+        - id
+        - state
+        - name
+        - fromEmail
+        - type
+        - host
+        - port
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        fromEmail:
+          type: string
+        type:
+          type: string
+          enum:
+            - GOOGLE
+            - YAHOO
+            - MICROSOFT
+            - OTHER
+        host:
+          type: string
+        port:
+          type: integer
+          format: int32
+        useSSL:
+          type: boolean
+        useAuth:
+          type: boolean
+        useAsDefault:
+          type: boolean
+        username:
+          type: string
+          format: email
+        password:
+          type: string
+          format: password
+        protocol:
+          type: string
+        state:
+          type: string
+          enum:
+            - NEW
+            - WAITING
+            - CONFIRM
+        createdAt:
+          type: string
+          format: date
+    RecipientDto:
+      type: object
+      required:
+        - email
+        - owner
+      properties:
+        email:
+          type: string
+          format: email
+        owner:
+          type: string
+    CodeVerificationDto:
+      type: object
+      required:
+        - code
+      properties:
+        code:
+          type: string

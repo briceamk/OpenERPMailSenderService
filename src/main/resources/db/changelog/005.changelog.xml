@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.6.xsd">
+    <property name="now" value="sysdate" dbms="oracle"/>
+    <property name="now" value="now()" dbms="mysql,postgresql"/>
+    <property name="now" value="CURRENT_TIMESTAMP()" dbms="h2"/>
+    <changeSet id="21022024:008" author="t_instance">
+       <update tableName="t_job_info">
+           <column name="c_cron_expression" value="0/5 * 9-21 ? * * *"/>
+           <where>c_id='331e9b85-6a61-4e6e-b13f-20fd4311e5a4'</where>
+       </update>
+       <update tableName="t_job_info">
+           <column name="c_cron_expression" value="* 0/1 9-21 ? * * *"/>
+           <where>c_id='d58197fa-4950-4961-b62a-f7a77839a25e'</where>
+       </update>
+       <update tableName="t_job_info">
+            <column name="c_cron_expression" value="* * 22 ? * * *"/>
+            <where>c_id='018dc37d-ff97-7b7d-8e50-2b4b387342d0'</where>
+       </update>
+        <update tableName="t_job_info">
+            <column name="c_cron_expression" value="* * 23 ? * * *"/>
+            <where>c_id='0a5b08bc-ad48-48ba-91ac-9ae0ab44561c'</where>
+        </update>
+    </changeSet>
+    <changeSet id="24022024:002" author="brice.mbiandji">
+        <addColumn tableName="t_mail">
+            <column name="c_disc_mail_type" type="VARCHAR(32)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="c_instance_id" type="VARCHAR(255)"/>
+        </addColumn>
+        <addForeignKeyConstraint baseColumnNames="c_instance_id" baseTableName="t_mail"
+                                 constraintName="fk_t_mail_instance_id" deferrable="false" initiallyDeferred="false"
+                                 onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="c_id"
+                                 referencedTableName="t_instance"/>
+        <update tableName="t_mail">
+            <column name="c_disc_mail_type" value="mail"/>
+            <where>c_type!='NOT_APPLICABLE'</where>
+        </update>
+        <update tableName="t_mail">
+            <column name="c_disc_mail_type" value="mail_instance"/>
+            <where>c_type='NOT_APPLICABLE'</where>
+        </update>
+        <addNotNullConstraint tableName="t_mail" columnName="c_disc_mail_type"/>
+    </changeSet>
+    <changeSet id="25022024:001" author="brice.mbiandji">
+        <update tableName="t_role">
+            <column name="c_permission" value="read:mail_server,create:mail_server,update:mail_server,update:send_code:mail_server,update:verify_code:mail_server,create:job_info,read:job_info,update:schedule:job_info,update:un_schedule:job_info,update:start:job_info,update:resume_job_info,update_delete:job_info,update:re_schedule:job_info,read:mail,create:instance,read:instance,read:mail_history,update:instance,update:activate:instance,update:inactive:instance"/>
+            <where>c_id='5f1f0637-a0a1-493a-8ed3-26d235464f35'</where>
+        </update>
+        <update tableName="t_role">
+            <column name="c_permission" value="read:mail_server,create:mail_server,update:mail_server,update:send_code:mail_server,update:verify_code:mail_server,create:job_info,read:job_info,update:schedule:job_info,update:un_schedule:job_info,update:start:job_info,update:resume_job_info,update_delete:job_info,update:re_schedule:job_info,read:mail,create:instance,read:instance,read:mail_history,update:instance,update:activate:instance,update:inactive:instance"/>
+            <where>c_id='a2f62b58-159c-470e-b2e7-43e434ed29c4'</where>
+        </update>
+    </changeSet>
+    <changeSet id="25022024:002" author="brice.mbiandji">
+        <update tableName="t_role">
+            <column name="c_permission" value="read:mail_server,create:mail_server,update:mail_server,update:send_code:mail_server,update:verify_code:mail_server,create:job_info,read:job_info,update:schedule:job_info,update:un_schedule:job_info,update:start:job_info,update:resume_job_info,update_delete:job_info,update:re_schedule:job_info,read:mail,create:instance,read:instance,read:mail_history,update:instance,update:activate:instance,update:inactive:instance,read:user"/>
+            <where>c_id='5f1f0637-a0a1-493a-8ed3-26d235464f35'</where>
+        </update>
+        <update tableName="t_role">
+            <column name="c_permission" value="read:mail_server,create:mail_server,update:mail_server,update:send_code:mail_server,update:verify_code:mail_server,create:job_info,read:job_info,update:schedule:job_info,update:un_schedule:job_info,update:start:job_info,update:resume_job_info,update_delete:job_info,update:re_schedule:job_info,read:mail,create:instance,read:instance,read:mail_history,update:instance,update:activate:instance,update:inactive:instance,read:user"/>
+            <where>c_id='a2f62b58-159c-470e-b2e7-43e434ed29c4'</where>
+        </update>
+    </changeSet>
+    <changeSet id="28022024:001" author="brice.mbiandji">
+        <addColumn tableName="t_mail">
+            <column name="c_attempt_to_send" type="INT"/>
+        </addColumn>
+    </changeSet>
+    <changeSet id="28022024:002" author="brice.mbiandji">
+       <update tableName="t_mail">
+           <column name="c_state" value="SEND"/>
+           <where>c_state='Send'</where>
+       </update>
+    </changeSet>
+</databaseChangeLog>

@@ -1,0 +1,431 @@
+openapi: 3.1.0
+info:
+  title: Security API
+  description: |
+    REST API endpoints for Security
+  version: 1.0.0
+servers:
+  - url: http://localhost:8089/api/v1/openerpmailsender
+    description: Development server
+paths:
+  /users/register:
+    post:
+      tags:
+        - Users
+      summary: Return information of new register user from database and send verification account code by mail
+      operationId: register
+      requestBody:
+        required: true
+        description: The new user information with need to add in database
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterUserDto'
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiSuccessResponseDto'
+        400:
+          description: Bad operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponseDto'
+        404:
+          description: Not found operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponseDto'
+        409:
+          description: Conflict operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponseDto'
+  /users/login:
+    post:
+      tags:
+        - Users
+      summary: Login user in application and return required token
+      operationId: login
+      requestBody:
+        required: true
+        description: The object that content the username and password use to authenticate user
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginDto'
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiSuccessResponseDto'
+        400:
+          description: Bad operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponseDto'
+        404:
+          description: Not found operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponseDto'
+  /users/activate/account/{code}:
+    get:
+      tags:
+        - Users
+      summary: Verify the new register user to activate his account
+      operationId: activateAccount
+      parameters:
+        - $ref: '#/components/parameters/code'
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiSuccessResponseDto'
+        400:
+          description: Bad operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponseDto'
+        404:
+          description: Not found operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponseDto'
+  /users/resend/mfa/code/{email}:
+    get:
+      tags:
+        - User
+      summary: Resend Mfa verification code if the user don't receive the code send by email
+      operationId: resendCode
+      parameters:
+        - $ref: '#/components/parameters/email'
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiSuccessResponseDto'
+        400:
+          description: Bad operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponseDto'
+        404:
+          description: Not found operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponseDto'
+  /users/reset-password/request-link:
+    post:
+      tags:
+        - Users
+      summary: request a link to reset to reset password
+      operationId: requestResetPassword
+      requestBody:
+        required: true
+        description: The object containing email where the link to reset password will be send
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RequestResetPasswordDto'
+      responses:
+        201:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiSuccessResponseDto'
+        400:
+          description: bad operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponseDto'
+        404:
+          description: not found operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponseDto'
+  /users/verify/password/{code}:
+    put:
+      tags:
+        - Users
+      summary: reset the password of the user
+      operationId: resetPassword
+      parameters:
+        - $ref: '#/components/parameters/code'
+      requestBody:
+        required: true
+        description: The object containing the new password
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResetPassword'
+      responses:
+        20O:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiSuccessResponseDto'
+        400:
+          description: bad operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponseDto'
+        404:
+          description: not found operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponseDto'
+
+  /users/verify/mfa/{email}/{code}:
+    get:
+      tags:
+        - Users
+      summary: When mfa is enable, verify the code send by email to login the user in the app
+      operationId: verifyMfa
+      parameters:
+        - $ref: '#/components/parameters/email'
+        - $ref: '#/components/parameters/code'
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiSuccessResponseDto'
+        400:
+          description: Bad operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponseDto'
+        404:
+          description: Not found operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponseDto'
+  /users/refresh/token:
+    get:
+      tags:
+        - Users
+      summary: When access token is expired, we generate a new token only if refresh token is not expired.
+      operationId: refreshToken
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiSuccessResponseDto'
+        400:
+          description: Bad operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponseDto'
+        404:
+          description: Not found operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponseDto'
+  /users/{userId}:
+    get:
+      tags:
+        - Users
+      summary: Return user by id
+      operationId: fetchUserById
+      parameters:
+        - $ref: '#/components/parameters/userId'
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiSuccessResponseDto'
+        400:
+          description: Bad operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponseDto'
+        404:
+          description: Not found operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponseDto'
+components:
+  parameters:
+    userId:
+      name: userId
+      in: path
+      required: true
+      schema:
+        type: string
+    email:
+      name: email
+      in: path
+      required: true
+      schema:
+        type: string
+        format: email
+    code:
+      name: code
+      in: path
+      required: true
+      schema:
+        type: string
+  schemas:
+    ValidationErrorDto:
+      type: object
+      required:
+        - field
+        - message
+      properties:
+        field:
+          type: string
+        message:
+          type: string
+    ApiResponseDto:
+      discriminator:
+        propertyName: apiResponseType
+      required:
+        - timestamp
+        - code
+        - status
+        - success
+      properties:
+        timestamp:
+          type: string
+        code:
+          type: integer
+          format: int32
+        status:
+          type: string
+        success:
+          type: boolean
+    ApiSuccessResponseDto:
+      allOf:
+        - $ref: '#/components/schemas/ApiResponseDto'
+        - type: object
+          properties:
+            message:
+              type: string
+            data:
+              type: object
+              additionalProperties:
+                type:
+    ApiErrorResponseDto:
+      allOf:
+        - $ref: '#/components/schemas/ApiResponseDto'
+        - type: object
+          required:
+            - reason
+            - path
+            - trackId
+          properties:
+            reason:
+              type: string
+            developerMessage:
+              type: string
+            path:
+              type: string
+            trackId:
+              type: string
+              format: uuid
+            error:
+              type: array
+              items:
+                $ref: '#/components/schemas/ValidationErrorDto'
+    RegisterUserDto:
+      type: object
+      required:
+        - lastName
+        - email
+        - password
+        - confirmPassword
+      properties:
+        firstName:
+          type: string
+        lastName:
+          type: string
+        email:
+          type: string
+          format: email
+        phone:
+          type: string
+        password:
+          type: string
+          format: password
+          minLength: 6
+          maxLength: 32
+        confirmPassword:
+          type: string
+          format: password
+          minLength: 6
+          maxLength: 32
+        useMfa:
+          type: boolean
+    LoginDto:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          format: password
+          minLength: 6
+          maxLength: 32
+    RequestResetPasswordDto:
+      type: object
+      required:
+        - email
+      properties:
+        email:
+          type: string
+          format: email
+    ResetPassword:
+      type: object
+      required:
+        - password
+        - confirmPassword
+      properties:
+        password:
+          type: string
+          format: password
+          minLength: 6
+          maxLength: 32
+        confirmPassword:
+          type: string
+          format: password
+          minLength: 6
+          maxLength: 32

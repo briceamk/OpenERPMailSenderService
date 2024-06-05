@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.6.xsd">
+    <property name="now" value="sysdate" dbms="oracle"/>
+    <property name="now" value="now()" dbms="mysql,postgresql"/>
+    <property name="now" value="CURRENT_TIMESTAMP()" dbms="h2"/>
+    <changeSet id="05022024:006" author="brice.mbiandji">
+        <createTable tableName="t_mail_server">
+            <column autoIncrement="false" name="c_id" type="VARCHAR(255)">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_t_mail_server_id"/>
+            </column>
+            <column name="c_created_at" type="DATE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="c_name" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="c_from_email" type="VARCHAR(512)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="c_type" type="VARCHAR(128)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="c_host" type="VARCHAR(128)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="c_port" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="c_protocol" type="VARCHAR(32)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="c_use_ssl" type="BOOLEAN" defaultValueBoolean="false"/>
+            <column name="c_use_auth" type="BOOLEAN" defaultValueBoolean="false"/>
+            <column name="c_username" type="VARCHAR(512)" />
+            <column name="c_password" type="VARCHAR(512)" />
+            <column name="c_state" type="VARCHAR(64)" />
+            <column name="c_verification_code" type="VARCHAR(512)" />
+            <column name="c_verified_at" type="DATETIME" />
+        </createTable>
+    </changeSet>
+    <changeSet id="05022024:007" author="brice.mbiandji">
+        <addUniqueConstraint columnNames="c_name" constraintName="uk_t_mail_server_name" tableName="t_mail_server"/>
+    </changeSet>
+    <changeSet id="05022024:008" author="brice.mbiandji">
+        <createTable tableName="t_queue">
+            <column autoIncrement="false" name="c_id" type="VARCHAR(255)">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_t_queue_id"/>
+            </column>
+            <column name="c_created_at" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="c_to" type="VARCHAR(512)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="c_subject" type="VARCHAR(512)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="c_message" type="TEXT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="c_external_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="c_state" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="c_send_at" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet id="05022024:009" author="brice.mbiandji">
+        <addUniqueConstraint columnNames="c_external_id" constraintName="uk_t_queue_external_id" tableName="t_queue"/>
+    </changeSet>
+    <changeSet id="05022024:010" author="brice.mbiandji">
+        <createTable tableName="t_verification">
+            <column autoIncrement="false" name="c_id" type="VARCHAR(255)">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_t_verification_id"/>
+            </column>
+            <column name="c_created_at" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="c_code" type="VARCHAR(12)"/>
+            <column name="c_status" type="VARCHAR(16)"/>
+            <column name="c_type" type="VARCHAR(16)"/>
+            <column name="c_url" type="VARCHAR(1024)"/>
+            <column name="c_user_id" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="c_expiration" type="DATETIME"/>
+        </createTable>
+        <addForeignKeyConstraint baseColumnNames="c_user_id" baseTableName="t_verification"
+                                 constraintName="fk_t_verification_user_id" deferrable="false" initiallyDeferred="false"
+                                 onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="c_id"
+                                 referencedTableName="t_user"/>
+    </changeSet>
+</databaseChangeLog>

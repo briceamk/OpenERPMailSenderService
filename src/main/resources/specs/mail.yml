@@ -1,0 +1,355 @@
+openapi: 3.1.0
+info:
+  title: Mail API
+  description: |
+    REST API endpoints for Mail
+  version: 1.0.0
+servers:
+  - url: http://localhost:8089/api/v1/openerpmailsender
+    description: Development server
+paths:
+  /mails:
+    get:
+      tags:
+        - Mail
+      summary: Fetch all mail from database
+      operationId: fetchMails
+      security:
+        - oAuth:
+            - read:mail
+      parameters:
+        - $ref: '#/components/parameters/page'
+        - $ref: '#/components/parameters/size'
+        - $ref: '#/components/parameters/direction'
+        - $ref: '#/components/parameters/attribute'
+      responses:
+        200:
+          description: successful operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiSuccessResponseDto'
+        400:
+          description: bad operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponseDto'
+        404:
+          description: not found operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponseDto'
+  /mails/search:
+    get:
+      tags:
+        - Mail
+      summary: Fetch all mail matching a keyword
+      operationId: fetchMailByKeyword
+      security:
+        - oAuth:
+            - read:mail
+      parameters:
+        - $ref: '#/components/parameters/page'
+        - $ref: '#/components/parameters/size'
+        - $ref: '#/components/parameters/direction'
+        - $ref: '#/components/parameters/attribute'
+        - $ref: '#/components/parameters/keyword'
+      responses:
+        200:
+          description: successful operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiSuccessResponseDto'
+        400:
+          description: bad operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponseDto'
+        404:
+          description: not found operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponseDto'
+  /mails/{mailId}:
+    put:
+      tags:
+        - MailServer
+      summary: update a mail with provided id
+      operationId: updateMailById
+      security:
+        - oAuth:
+            - update:mail
+      requestBody:
+        required: true
+        description: instance object we need to update in database
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateMailRequestDto'
+      parameters:
+        - $ref: '#/components/parameters/mailId'
+      responses:
+        200:
+          description: successful operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiSuccessResponseDto'
+        404:
+          description: not found operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponseDto'
+    get:
+      tags:
+        - MailServer
+      summary: Return mail fetched from database with provided id
+      operationId: fetchMailById
+      security:
+        - oAuth:
+            - read:mail
+      parameters:
+        - $ref: '#/components/parameters/mailId'
+      responses:
+        200:
+          description: successful operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiSuccessResponseDto'
+        404:
+          description: not found operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponseDto'
+components:
+  parameters:
+    mailId:
+      name: mailId
+      in: path
+      required: true
+      schema:
+        type: string
+    page:
+      name: page
+      in: query
+      required: true
+      schema:
+        type: integer
+    size:
+      name: size
+      in: query
+      required: true
+      schema:
+        type: integer
+    direction:
+      name: direction
+      in: query
+      required: true
+      schema:
+        type: string
+        enum:
+          - ASC
+          - DSC
+    attribute:
+      name: attribute
+      in: query
+      required: true
+      schema:
+        type: string
+    keyword:
+      name: keyword
+      in: query
+      required: true
+      schema:
+        type: string
+  schemas:
+    ValidationErrorDto:
+      type: object
+      required:
+        - field
+        - message
+      properties:
+        field:
+          type: string
+        message:
+          type: string
+    ApiResponseDto:
+      type: object
+      required:
+        - timestamp
+        - code
+        - status
+        - success
+      properties:
+        timestamp:
+          type: string
+        code:
+          type: integer
+          format: int32
+        status:
+          type: string
+        success:
+          type: boolean
+    ApiSuccessResponseDto:
+      allOf:
+        - $ref: '#/components/schemas/ApiResponseDto'
+        - type: object
+          properties:
+            message:
+              type: string
+            data:
+              type: object
+              additionalProperties:
+                type: object
+    ApiErrorResponseDto:
+      allOf:
+        - $ref: '#/components/schemas/ApiResponseDto'
+        - type: object
+          required:
+            - reason
+            - path
+            - trackId
+          properties:
+            reason:
+              type: string
+            developerMessage:
+              type: string
+            path:
+              type: string
+            trackId:
+              type: string
+              format: uuid
+            error:
+              type: array
+              items:
+                $ref: '#/components/schemas/ValidationErrorDto'
+    UpdateMailRequestDto:
+      type: object
+      required:
+        - id
+        - to
+        - subject
+        - state
+        - type
+        - createdAt
+        - mailServer
+      properties:
+        id:
+          type: string
+        to:
+          type: string
+        subject:
+          type: string
+        message:
+          type: string
+        attemptToSend:
+          type: integer
+          format: int32
+        externalId:
+          type: integer
+          format: int64
+        externalServerId:
+          type: integer
+          format: int64
+        state:
+          type: string
+          enum:
+            - DRAFT
+            - SENDING
+            - SEND
+            - ERROR
+            - COMPLETE
+        type:
+          type: string
+          enum:
+            - ACTIVATE_ACCOUNT
+            - RESET_PASSWORD
+            - MFA
+            - VERIFY_MAIL_SERVER
+            - NOT_APPLICABLE
+        createdAt:
+          type: string
+          format: date-time
+        sendAt:
+          type: string
+          format: date-time
+        mailServer:
+          $ref: '#/components/schemas/MailServerDto'
+        mailTemplate:
+          $ref: '#/components/schemas/MailTemplateDto'
+    MailTemplateDto:
+      type: object
+      required:
+        - id
+        - name
+        - type
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        type:
+          type: string
+    MailServerDto:
+      type: object
+      required:
+        - id
+        - state
+        - name
+        - fromEmail
+        - type
+        - host
+        - port
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        fromEmail:
+          type: string
+        type:
+          type: string
+          enum:
+            - GOOGLE
+            - YAHOO
+            - MICROSOFT
+            - OTHER
+        host:
+          type: string
+        port:
+          type: integer
+          format: int32
+        useSSL:
+          type: boolean
+        useAuth:
+          type: boolean
+        useAsDefault:
+          type: boolean
+        username:
+          type: string
+          format: email
+        password:
+          type: string
+          format: password
+        protocol:
+          type: string
+        state:
+          type: string
+          enum:
+            - NEW
+            - WAITING
+            - CONFIRM
+        createdAt:
+          type: string
+          format: date
+
+
+

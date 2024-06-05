@@ -1,0 +1,59 @@
+server:
+  port: 8089
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5433/openerpmailsenderdb
+    username: openerpmailsender
+    password: 1VG7pQxevAOfgF1IBEOtr9PkUIaY24mbd9IRBdg0tx4ZIKb8hAhv0jJwjYPFQ9N8
+  quartz:
+    properties:
+      org:
+        quartz:
+          dataSource:
+            quartzDS:
+              driver: org.postgresql.Driver
+              URL: jdbc:postgresql://localhost:5433/openerpmailsenderdb
+              username: openerpmailsender
+              password: 1VG7pQxevAOfgF1IBEOtr9PkUIaY24mbd9IRBdg0tx4ZIKb8hAhv0jJwjYPFQ9N8
+              provider: hikaricp
+  jpa:
+    generate-ddl: true
+    show-sql: true
+    hibernate:
+      ddl-auto: none
+    properties:
+      hibernate:
+        format_sql: true
+        globally_quoted_identifiers: true
+        globally_quoted_identifiers_skip_column_definitions: true
+    open-in-view: false
+  sql:
+    init:
+      mode: never
+      continue-on-error: false
+  liquibase:
+    change-log: classpath:db/changelog/master.xml
+
+jwt:
+  secret: u44oN2SreXIRJMxmMzHL9Fh7V8Rn3CNmV3TGPwcCA4m1K2c6ebtmBkLbLNIbpXZZ
+  access:
+    token:
+      expiration:
+        time: 86_400_000 #One day in milliseconds
+  refresh:
+    token:
+      expiration:
+        time: 432_000_000 #Five days in milliseconds
+
+frontend:
+  context:
+    host: http://localhost:4200
+
+openerp:
+  remote:
+    host: http://18.119.23.166
+    port: 8069
+    username: admin
+    password: GELTot2022
+    db: TOTAL_GNQ_TEST

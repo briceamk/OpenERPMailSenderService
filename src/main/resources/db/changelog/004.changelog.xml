@@ -1,0 +1,235 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.6.xsd">
+    <property name="now" value="sysdate" dbms="oracle"/>
+    <property name="now" value="now()" dbms="mysql,postgresql"/>
+    <property name="now" value="CURRENT_TIMESTAMP()" dbms="h2"/>
+    <changeSet id="17022024:002" author="brice.mbiandji">
+        <createTable tableName="t_job_info">
+            <column autoIncrement="false" name="c_id" type="VARCHAR(255)">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_t_job_info"/>
+            </column>
+            <column name="c_job_name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="c_job_class" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="c_job_group" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="c_cron_expression" type="VARCHAR(255)"/>
+            <column name="c_use_as_cron_job" type="BOOLEAN" />
+            <column name="c_interval" type="BIGINT" />
+            <column name="c_state" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addUniqueConstraint columnNames="c_job_name" constraintName="uk_t_job_info_job_name" tableName="t_job_info"/>
+        <addUniqueConstraint columnNames="c_job_class" constraintName="uk_t_job_info_job_class" tableName="t_job_info"/>
+        <update tableName="t_role">
+            <column name="c_permission" value="read:mail_server,create:mail_server,update:mail_server,update:send_code:mail_server,update:verify_code:mail_server,create:job_info"/>
+            <where>c_id='5f1f0637-a0a1-493a-8ed3-26d235464f35'</where>
+        </update>
+        <update tableName="t_role">
+            <column name="c_permission" value="read:mail_server,create:mail_server,update:mail_server,update:send_code:mail_server,update:verify_code:mail_server,create:job_info"/>
+            <where>c_id='a2f62b58-159c-470e-b2e7-43e434ed29c4'</where>
+        </update>
+    </changeSet>
+    <changeSet id="17022024:003" author="brice.mbiandji">
+        <insert tableName="t_job_info">
+            <column name="c_id" value="331e9b85-6a61-4e6e-b13f-20fd4311e5a4"/>
+            <column name="c_job_name" value="Send Mail Job"/>
+            <column name="c_job_group" value="Mail"/>
+            <column name="c_job_class" value="cm.xenonit.gelodia.openerpmailsender.schedule.job.SendMailCronJob"/>
+            <column name="c_cron_expression" value="0/10 * * ? * *"/>
+            <column name="c_use_as_cron_job" valueBoolean="true"/>
+            <column name="c_state" value="DRAFT"/>
+        </insert>
+    </changeSet>
+    <changeSet id="17022024:004" author="brice.mbiandji">
+        <insert tableName="t_job_info">
+            <column name="c_id" value="d58197fa-4950-4961-b62a-f7a77839a25e"/>
+            <column name="c_job_name" value="Fetch Remote Mail In Queue Job"/>
+            <column name="c_job_group" value="Mail"/>
+            <column name="c_job_class" value="cm.xenonit.gelodia.openerpmailsender.schedule.job.FetchRemoteMailJob"/>
+            <column name="c_cron_expression" value="0 0/1 * ? * *"/>
+            <column name="c_use_as_cron_job" valueBoolean="true"/>
+            <column name="c_state" value="DRAFT"/>
+        </insert>
+    </changeSet>
+    <changeSet id="18022024:001" author="brice.mbiandji">
+        <insert tableName="t_job_info">
+            <column name="c_id" value="0a5b08bc-ad48-48ba-91ac-9ae0ab44561c"/>
+            <column name="c_job_name" value="Delete Remote Mail In Queue Job"/>
+            <column name="c_job_group" value="Mail"/>
+            <column name="c_job_class" value="cm.xenonit.gelodia.openerpmailsender.schedule.job.DeleteRemoteMailInQueueStateJob"/>
+            <column name="c_cron_expression" value="0 0/5 * ? * *"/>
+            <column name="c_use_as_cron_job" valueBoolean="true"/>
+            <column name="c_state" value="DRAFT"/>
+        </insert>
+    </changeSet>
+    <changeSet id="19022024:001" author="brice.mbiandji">
+        <addColumn tableName="t_mail">
+            <column name="c_external_server_id" type="BIGINT"/>
+        </addColumn>
+    </changeSet>
+    <changeSet id="19022024:002" author="brice.mbiandji">
+        <update tableName="t_role">
+            <column name="c_permission" value="read:mail_server,create:mail_server,update:mail_server,update:send_code:mail_server,update:verify_code:mail_server,create:job_info,read:mail"/>
+            <where>c_id='5f1f0637-a0a1-493a-8ed3-26d235464f35'</where>
+        </update>
+        <update tableName="t_role">
+            <column name="c_permission" value="read:mail_server,create:mail_server,update:mail_server,update:send_code:mail_server,update:verify_code:mail_server,create:job_info,read:mail"/>
+            <where>c_id='a2f62b58-159c-470e-b2e7-43e434ed29c4'</where>
+        </update>
+    </changeSet>
+    <changeSet id="19022024:003" author="brice.mbiandji">
+        <insert tableName="t_job_info">
+            <column name="c_id" value="018dc37d-ff97-7b7d-8e50-2b4b387342d0"/>
+            <column name="c_job_name" value="Create Remote Mail In History Queue Job"/>
+            <column name="c_job_group" value="Mail"/>
+            <column name="c_job_class" value="cm.xenonit.gelodia.openerpmailsender.schedule.job.CreateRemoteMailInHistoryQueueStateJob"/>
+            <column name="c_cron_expression" value="0 0/3 * ? * *"/>
+            <column name="c_use_as_cron_job" valueBoolean="true"/>
+            <column name="c_state" value="DRAFT"/>
+        </insert>
+        <createTable tableName="t_mail_history">
+            <column autoIncrement="false" name="c_id" type="VARCHAR(255)">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_t_mail_history"/>
+            </column>
+            <column name="c_to" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="c_subject" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="c_message" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="c_mail_server_id" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addForeignKeyConstraint baseColumnNames="c_mail_server_id" baseTableName="t_mail_history"
+                                 constraintName="fk_t_mail_history_server_id" deferrable="false" initiallyDeferred="false"
+                                 onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="c_id"
+                                 referencedTableName="t_mail_server"/>
+        <createTable tableName="t_mail_history_attribute">
+            <column name="c_mail_history_id" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="c_attribute_key" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="c_attribute_value" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addPrimaryKey tableName="t_mail_history_attribute" columnNames="c_mail_history_id,c_attribute_key" constraintName="pk_t_mail_history_attribute_mail_history_attribute_key"/>
+        <addForeignKeyConstraint baseColumnNames="c_mail_history_id" baseTableName="t_mail_history_attribute"
+                                 constraintName="fk_t_mail_history_attribute_mail_history_id" deferrable="false" initiallyDeferred="false"
+                                 onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="c_id"
+                                 referencedTableName="t_mail_history"/>
+    </changeSet>
+    <changeSet id="21022024:001" author="brice.mbiandji">
+        <modifyDataType tableName="t_mail_history" columnName="c_message" newDataType="TEXT"/>
+    </changeSet>
+    <changeSet id="21022024:002" author="brice.mbiandji">
+        <createTable tableName="t_instance">
+            <column autoIncrement="false" name="c_id" type="VARCHAR(255)">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_t_instance"/>
+            </column>
+            <column name="c_host" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="c_port" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="c_db" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="c_username" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="c_password" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="c_mail_server_id" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addForeignKeyConstraint baseColumnNames="c_mail_server_id" baseTableName="t_instance"
+                                 constraintName="fk_t_instance_mail_server_id" deferrable="false" initiallyDeferred="false"
+                                 onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="c_id"
+                                 referencedTableName="t_mail_server"/>
+        <dropForeignKeyConstraint baseTableName="t_mail_history" constraintName="fk_t_mail_history_server_id"/>
+        <addForeignKeyConstraint baseColumnNames="c_mail_server_id" baseTableName="t_mail_history"
+                                 constraintName="fk_t_mail_history_mail_server_id" deferrable="false" initiallyDeferred="false"
+                                 onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="c_id"
+                                 referencedTableName="t_mail_server"/>
+
+    </changeSet>
+    <changeSet id="21022024:003" author="brice.mbiandji">
+        <addUniqueConstraint tableName="t_instance" columnNames="c_host,c_port,c_db" constraintName="uk_t_instance_host_port_db"/>
+        <createIndex tableName="t_instance" indexName="ix_t_instance_mail_server_id">
+            <column name="c_mail_server_id"/>
+        </createIndex>
+        <createIndex tableName="t_mail_history" indexName="ix_t_mail_history_mail_server_id">
+            <column name="c_mail_server_id"/>
+        </createIndex>
+        <createIndex tableName="t_mail_history_attribute" indexName="ix_t_mail_history_attribute_mail_history_id">
+            <column name="c_mail_history_id"/>
+        </createIndex>
+        <createIndex tableName="t_mail_attribute" indexName="ix_t_mail_attribute_mail_id">
+            <column name="c_mail_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet id="21022024:004" author="t_instance">
+        <addColumn tableName="t_instance">
+            <column name="c_state" type="VARCHAR(32)">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet id="21022024:005" author="t_instance">
+        <update tableName="t_role">
+            <column name="c_permission" value="read:mail_server,create:mail_server,update:mail_server,update:send_code:mail_server,update:verify_code:mail_server,create:job_info,read:job_info,update:schedule:job_info,update:un_schedule:job_info,update:start:job_info,update:resume_job_info,update_delete:job_info,update:re_schedule:job_info,read:mail,create:instance,read:instance:read_mail_history"/>
+            <where>c_id='5f1f0637-a0a1-493a-8ed3-26d235464f35'</where>
+        </update>
+        <update tableName="t_role">
+            <column name="c_permission" value="read:mail_server,create:mail_server,update:mail_server,update:send_code:mail_server,update:verify_code:mail_server,create:job_info,read:job_info,update:schedule:job_info,update:un_schedule:job_info,update:start:job_info,update:resume_job_info,update_delete:job_info,update:re_schedule:job_info,read:mail,create:instance,read:instance:read_mail_history"/>
+            <where>c_id='a2f62b58-159c-470e-b2e7-43e434ed29c4'</where>
+        </update>
+    </changeSet>
+    <changeSet id="21022024:006" author="t_instance">
+        <update tableName="t_role">
+            <column name="c_permission" value="read:mail_server,create:mail_server,update:mail_server,update:send_code:mail_server,update:verify_code:mail_server,create:job_info,read:job_info,update:schedule:job_info,update:un_schedule:job_info,update:start:job_info,update:resume_job_info,update_delete:job_info,update:re_schedule:job_info,read:mail,create:instance,read:instance,read:mail_history"/>
+            <where>c_id='5f1f0637-a0a1-493a-8ed3-26d235464f35'</where>
+        </update>
+        <update tableName="t_role">
+            <column name="c_permission" value="read:mail_server,create:mail_server,update:mail_server,update:send_code:mail_server,update:verify_code:mail_server,create:job_info,read:job_info,update:schedule:job_info,update:un_schedule:job_info,update:start:job_info,update:resume_job_info,update_delete:job_info,update:re_schedule:job_info,read:mail,create:instance,read:instance,read:mail_history"/>
+            <where>c_id='a2f62b58-159c-470e-b2e7-43e434ed29c4'</where>
+        </update>
+    </changeSet>
+    <changeSet id="21022024:007" author="t_instance">
+        <update tableName="t_role">
+            <column name="c_permission" value="read:mail_server,create:mail_server,update:mail_server,update:send_code:mail_server,update:verify_code:mail_server,create:job_info,read:job_info,update:schedule:job_info,update:un_schedule:job_info,update:start:job_info,update:resume_job_info,update_delete:job_info,update:re_schedule:job_info,read:mail,create:instance,read:instance,read:mail_history,update:instance"/>
+            <where>c_id='5f1f0637-a0a1-493a-8ed3-26d235464f35'</where>
+        </update>
+        <update tableName="t_role">
+            <column name="c_permission" value="read:mail_server,create:mail_server,update:mail_server,update:send_code:mail_server,update:verify_code:mail_server,create:job_info,read:job_info,update:schedule:job_info,update:un_schedule:job_info,update:start:job_info,update:resume_job_info,update_delete:job_info,update:re_schedule:job_info,read:mail,create:instance,read:instance,read:mail_history,update:instance"/>
+            <where>c_id='a2f62b58-159c-470e-b2e7-43e434ed29c4'</where>
+        </update>
+    </changeSet>
+    <changeSet id="21022024:008" author="t_instance">
+       <addColumn tableName="t_mail_history">
+           <column name="c_created_at" type="DATETIME">
+               <constraints nullable="false"/>
+           </column>
+       </addColumn>
+    </changeSet>
+</databaseChangeLog>

@@ -1,0 +1,48 @@
+server:
+  port: 8080
+spring:
+  datasource:
+    url: jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_NAME}
+    username: openerpmailsender
+    password: TuCk0QzeqlfLkUgzekaEUG0M5PBHAoBi2O9QNw2UJb2tbgr86AQoLFo2VDjmg9I2
+  jpa:
+    generate-ddl: false
+    show-sql: false
+    hibernate:
+      ddl-auto: none
+    properties:
+      hibernate:
+        format_sql: false
+        globally_quoted_identifiers: true
+        globally_quoted_identifiers_skip_column_definitions: true
+    open-in-view: false
+  sql:
+    init:
+      mode: never
+      continue-on-error: false
+  liquibase:
+    change-log: classpath:db/changelog/master.xml
+  quartz:
+    properties:
+      org:
+        quartz:
+          dataSource:
+            quartzDS:
+              driver: org.postgresql.Driver
+              URL: jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_NAME}
+              username: openerpmailsender
+              password: TuCk0QzeqlfLkUgzekaEUG0M5PBHAoBi2O9QNw2UJb2tbgr86AQoLFo2VDjmg9I2
+              provider: hikaricp
+jwt:
+  secret: BXvN6lV2KItm8bGiyrRWRXNmluvymMi2maLea3m8gaV66gUl1NvFcJYEIAhyf1BE
+  access:
+    token:
+      expiration:
+        time: 86_400_000 #One day in milliseconds
+  refresh:
+    token:
+      expiration:
+        time: 432_000_000 #Five days in milliseconds
+frontend:
+  context:
+    host: ${FRONT_URL}

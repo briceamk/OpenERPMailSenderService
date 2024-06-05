@@ -1,0 +1,438 @@
+openapi: 3.1.0
+info:
+  title: JobInfo Scheduler API
+  description: |
+    REST API endpoints for Job Scheduler
+  version: 1.0.0
+servers:
+  - url: http://localhost:8089/api/v1/openerpmailsender
+    description: Development server
+paths:
+  /job-infos:
+    post:
+      tags:
+        - JobInfo
+      summary: Return the created job info in database
+      operationId: createJobInfo
+      security:
+        - oAuth:
+            - create:job_info
+      requestBody:
+        required: true
+        description: The job info object we need to create
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateJobInfoRequestDto'
+      responses:
+        201:
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiSuccessResponseDto'
+        400:
+          description: Bad operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponseDto'
+        409:
+          description: Conflict operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponseDto'
+    get:
+      tags:
+        - JobInfo
+      summary: Return a page of job info in database
+      operationId: fetchJobInfos
+      security:
+        - oAuth:
+            - read:job_info
+      parameters:
+        - $ref: '#/components/parameters/page'
+        - $ref: '#/components/parameters/size'
+        - $ref: '#/components/parameters/direction'
+        - $ref: '#/components/parameters/attribute'
+      responses:
+        200:
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiSuccessResponseDto'
+  /job-infos/{jobInfoId}:
+    get:
+      tags:
+        - JobInfo
+      summary: Fetch a job info from database with the given id
+      operationId: findJobInfoById
+      security:
+        - oAuth:
+            - read:job_info
+      parameters:
+        - $ref: '#/components/parameters/jobInfoId'
+      responses:
+        200:
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiSuccessResponseDto'
+        404:
+          description: Bad operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponseDto'
+  /job-infos/search:
+    get:
+      tags:
+        - JobInfo
+      summary: Return a page of job info in database
+      operationId: fetchJobInfoByKeyword
+      security:
+        - oAuth:
+            - read:job_info
+      parameters:
+        - $ref: '#/components/parameters/page'
+        - $ref: '#/components/parameters/size'
+        - $ref: '#/components/parameters/direction'
+        - $ref: '#/components/parameters/attribute'
+        - $ref: '#/components/parameters/keyword'
+      responses:
+        200:
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiSuccessResponseDto'
+  /job-infos/schedule/{jobInfoId}:
+    put:
+      tags:
+        - JobInfo
+      summary: schedule trigger for an existing job
+      operationId: scheduleJobById
+      security:
+        - oAuth:
+            - update:schedule:job_info
+      parameters:
+        - $ref: '#/components/parameters/jobInfoId'
+      responses:
+        200:
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiSuccessResponseDto'
+        404:
+          description: Bad operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponseDto'
+        500:
+          description: Internal error operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponseDto'
+  /job-infos/unschedule/{jobInfoId}:
+    put:
+      tags:
+        - JobInfo
+      summary: un-schedule an existing job
+      operationId: unScheduleJobById
+      security:
+        - oAuth:
+            - update:un_schedule:job_info
+      parameters:
+        - $ref: '#/components/parameters/jobInfoId'
+      responses:
+        200:
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiSuccessResponseDto'
+        400:
+          description: Bad operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponseDto'
+        404:
+          description: Bad operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponseDto'
+        500:
+          description: Internal error operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponseDto'
+  /job-infos/start/{jobInfoId}:
+    put:
+      tags:
+        - JobInfo
+      summary: start an existing job
+      operationId: startJobById
+      security:
+        - oAuth:
+            - update:start:job_info
+      parameters:
+        - $ref: '#/components/parameters/jobInfoId'
+      responses:
+        200:
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiSuccessResponseDto'
+        400:
+          description: Bad operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponseDto'
+        404:
+          description: Bad operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponseDto'
+        500:
+          description: Internal error operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponseDto'
+  /job-infos/resume/{jobInfoId}:
+    put:
+      tags:
+        - JobInfo
+      summary: resume an existing job
+      operationId: resumeJobById
+      security:
+        - oAuth:
+            - update:resume:job_info
+      parameters:
+        - $ref: '#/components/parameters/jobInfoId'
+      responses:
+        200:
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiSuccessResponseDto'
+        400:
+          description: Bad operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponseDto'
+        404:
+          description: Bad operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponseDto'
+        500:
+          description: Internal error operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponseDto'
+  /job-infos/delete/{jobInfoId}:
+    put:
+      tags:
+        - JobInfo
+      summary: delete trigger for an existing job
+      operationId: deleteJobById
+      security:
+        - oAuth:
+            - update:delete:job_info
+      parameters:
+        - $ref: '#/components/parameters/jobInfoId'
+      responses:
+        200:
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiSuccessResponseDto'
+        404:
+          description: Bad operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponseDto'
+        500:
+          description: Internal error operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponseDto'
+  /job-infos/re-schedule/{jobInfoId}:
+    put:
+      tags:
+        - JobInfo
+      summary: Reschedule trigger for an existing job
+      operationId: reScheduleJobById
+      security:
+        - oAuth:
+            - update:re_schedule:job_info
+      parameters:
+        - $ref: '#/components/parameters/jobInfoId'
+      responses:
+        200:
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiSuccessResponseDto'
+        400:
+          description: Bad operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponseDto'
+        404:
+          description: Bad operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponseDto'
+        500:
+          description: Internal error operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponseDto'
+
+components:
+  parameters:
+    jobInfoId:
+      name: jobInfoId
+      in: path
+      required: true
+      schema:
+        type: string
+    page:
+      name: page
+      in: query
+      required: true
+      schema:
+        type: integer
+    size:
+      name: size
+      in: query
+      required: true
+      schema:
+        type: integer
+    direction:
+      name: direction
+      in: query
+      required: true
+      schema:
+        type: string
+        enum:
+          - ASC
+          - DSC
+    attribute:
+      name: attribute
+      in: query
+      required: true
+      schema:
+        type: string
+    keyword:
+      name: keyword
+      in: query
+      required: true
+      schema:
+        type: string
+  schemas:
+    ValidationErrorDto:
+      type: object
+      required:
+        - field
+        - message
+      properties:
+        field:
+          type: string
+        message:
+          type: string
+    ApiResponseDto:
+      type: object
+      required:
+        - timestamp
+        - code
+        - status
+        - success
+      properties:
+        timestamp:
+          type: string
+        code:
+          type: integer
+          format: int32
+        status:
+          type: string
+        success:
+          type: boolean
+    ApiSuccessResponseDto:
+      allOf:
+        - $ref: '#/components/schemas/ApiResponseDto'
+        - type: object
+          properties:
+            message:
+              type: string
+            data:
+              type: object
+              additionalProperties:
+                type: object
+    ApiErrorResponseDto:
+      allOf:
+        - $ref: '#/components/schemas/ApiResponseDto'
+        - type: object
+          required:
+            - reason
+            - path
+            - trackId
+          properties:
+            reason:
+              type: string
+            developerMessage:
+              type: string
+            path:
+              type: string
+            trackId:
+              type: string
+              format: uuid
+            error:
+              type: array
+              items:
+                $ref: '#/components/schemas/ValidationErrorDto'
+    CreateJobInfoRequestDto:
+      type: object
+      required:
+        - jobName
+        - jobGroup
+        - JobClass
+        - useAsCronJob
+      properties:
+        jobName:
+          type: string
+        jobGroup:
+          type: string
+        jobClass:
+          type: string
+        cronExpression:
+          type: string
+        useAsCronJob:
+          type: boolean
+        interval:
+          type: integer

@@ -1,0 +1,27 @@
+spring:
+  profiles:
+    active: @spring.profiles.active@
+  quartz:
+    job-store-type: jdbc
+    properties:
+      org:
+        quartz:
+          scheduler:
+            instanceId: AUTO
+            instanceName: PostgresScheduler
+          threadPool:
+            class: org.quartz.simpl.SimpleThreadPool
+            threadCount: 8
+          jobStore:
+            class: org.quartz.impl.jdbcjobstore.JobStoreTX
+            driverDelegateClass: org.quartz.impl.jdbcjobstore.PostgreSQLDelegate
+            dataSource: quartzDS
+  application:
+    title: OpenERPMailSender
+    version: 1.0
+    name: OpenERPMailSender
+security:
+  max:
+    failed:
+      login:
+        count: 5
